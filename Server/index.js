@@ -8,10 +8,11 @@ const { Chess } = require("chess.js");
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173", // The Vite dev server address
+    methods: ["GET", "POST"],
+  },
 });
 
 io.on("connection", (socket) => {
