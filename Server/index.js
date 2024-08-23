@@ -4,6 +4,7 @@ const express = require("express");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const path = require("path");
+const { Chess } = require("chess.js");
 
 const app = express();
 const server = createServer(app);
