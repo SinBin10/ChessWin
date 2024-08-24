@@ -3,11 +3,14 @@ const express = require("express");
 //the functionality is the same as app.listen(creates a server as well)
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
-const path = require("path");
 const { Chess } = require("chess.js");
 
 const app = express();
 const server = createServer(app);
+
+let players = {};
+let currentPlayer = "W";
+
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173", // The Vite dev server address
@@ -17,8 +20,9 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log("server connected...");
-  socket.on("disconnect", () => {
-    console.log("server disconncted...");
+  socket.on("event", () => {
+    console.log("event received on server...");
+    io.emit("event2");
   });
 });
 
