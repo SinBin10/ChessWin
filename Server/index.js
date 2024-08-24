@@ -39,6 +39,26 @@ io.on("connection", (socket) => {
       console.log("player black left...");
     }
   });
+  socket.on("move", (move) => {
+    try {
+      // During white's turn black cannot move and vice versa
+      if (Chess.turn() === "w" && socket.id !== players.white) return;
+      if (Chess.turn() === "b" && socket.id !== players.black) return;
+
+      let result = Chess.move(move);
+      if (result) {
+        currentPlayer = Chess.turn();
+        io.emit("move", move);
+        io.emit("boardState", Chess.fen());
+      } else {
+        console.log("invalid move...");
+        socket.emit("invalid move", move);
+      }
+    } catch (err) {
+      console.log(err);
+      socket.emit("invalid move", move);
+    }
+  });
 });
 
 server.listen(3000, () => {
