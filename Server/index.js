@@ -9,7 +9,7 @@ const app = express();
 const server = createServer(app);
 
 let players = {};
-let currentPlayer = "W";
+let currentPlayer = "w";
 
 const io = new Server(server, {
   cors: {
@@ -20,9 +20,24 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log("server connected...");
-  socket.on("event", () => {
-    console.log("event received on server...");
-    io.emit("event2");
+  if (!players.white) {
+    players.white = socket.id;
+    socket.emit("playerRole", "w");
+  } else if (!players.black) {
+    players.black = socket.id;
+    socket.emit("playerRole", "b");
+  } else {
+    socket.emit("spectator");
+  }
+  console.log(players);
+  socket.on("disconnect", () => {
+    if (socket.id === players.white) {
+      delete players.white;
+      console.log("player white left...");
+    } else if (socket.id === players.black) {
+      delete players.black;
+      console.log("player black left...");
+    }
   });
 });
 
