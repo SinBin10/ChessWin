@@ -12,6 +12,22 @@ const App = () => {
   let draggedPiece = null;
   let sourceSquare = null;
   let playerRole = null;
+  const pieces = [
+    { type: "p", color: "w", logo: "♙" },
+    { type: "r", color: "w", logo: "♖" },
+    { type: "n", color: "w", logo: "♘" },
+    { type: "b", color: "w", logo: "♗" },
+    { type: "q", color: "w", logo: "♕" },
+    { type: "k", color: "w", logo: "♔" },
+
+    { type: "p", color: "b", logo: "♟" },
+    { type: "r", color: "b", logo: "♜" },
+    { type: "n", color: "b", logo: "♞" },
+    { type: "b", color: "b", logo: "♝" },
+    { type: "q", color: "b", logo: "♛" },
+    { type: "k", color: "b", logo: "♚" },
+  ];
+
   const chess = new Chess();
   return (
     <>
@@ -22,12 +38,17 @@ const App = () => {
               {row.map((col, colIndex) => (
                 <div
                   key={`${rowIndex}-${colIndex}`}
-                  className={`h-16 w-16 ${
+                  className={`h-16 w-16 text-4xl flex items-center justify-center ${
                     (rowIndex + colIndex) % 2 === 0
                       ? "bg-[#fbf5de]"
-                      : "bg-[#f8e7bb]"
+                      : "bg-[#f2ca5c]"
                   }`}
-                ></div>
+                >
+                  {col &&
+                    pieces.find((p) => {
+                      return p.type === col.type && p.color === col.color;
+                    }).logo}
+                </div>
               ))}
             </div>
           ))}
