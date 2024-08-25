@@ -9,12 +9,14 @@ const path = require("path");
 const app = express();
 const server = createServer(app);
 const chess = new Chess();
+require("dotenv").config();
+const PORT = process.env.PORT || 3000;
 
 let players = {};
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // The Vite dev server address
+    origin: "https://localhost:3000", // The Vite dev server address
     methods: ["GET", "POST"],
   },
 });
@@ -75,6 +77,6 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log("server running at http://localhost:3000");
+server.listen(PORT, () => {
+  console.log(`server running at http://localhost:${PORT}`);
 });

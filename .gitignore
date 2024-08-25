@@ -21,3 +21,4 @@ Client/*.ntvs*
 Client/*.njsproj
 Client/*.sln
 Client/*.sw?
+Server/.env
