@@ -7,7 +7,7 @@ const App = () => {
   const [socket, setSocket] = useState(null);
   const [winner, setWinner] = useState(null);
   useEffect(() => {
-    const newSocket = io("https://chess-win-backend.vercel.app/");
+    const newSocket = io("http://localhost:3000");
     setSocket(newSocket);
     newSocket.on("boardState", (fen) => {
       const updatedChess = new Chess(fen);
