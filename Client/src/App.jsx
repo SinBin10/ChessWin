@@ -1,17 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { Chess } from "chess.js";
 
 const App = () => {
+  const [board, setBoard] = useState(new Chess().board());
+  const [socket, setSocket] = useState(null);
   useEffect(() => {
-    const socket = io("http://localhost:3000");
+    const newSocket = io("http://localhost:3000");
+    setSocket(newSocket);
+    newSocket.on("boardState", (fen) => {
+      const updatedChess = new Chess(fen);
+      console.log(updatedChess);
+      setBoard(updatedChess.board());
+    });
     return () => {
-      socket.disconnect();
+      newSocket.disconnect();
     };
   }, []);
-  let draggedPiece = null;
-  let sourceSquare = null;
-  let playerRole = null;
   const pieces = [
     { type: "p", color: "w", logo: "♙" },
     { type: "r", color: "w", logo: "♖" },
@@ -27,13 +32,30 @@ const App = () => {
     { type: "q", color: "b", logo: "♛" },
     { type: "k", color: "b", logo: "♚" },
   ];
+  let draggedPiece = null;
+  let sourceSquare = null;
 
-  const chess = new Chess();
+  function handleDragStart(col, rowIndex, colIndex) {
+    draggedPiece = col;
+    sourceSquare = col.square;
+  }
+
+  function handleDrop(rowIndex, colIndex) {
+    if (!draggedPiece) return;
+    const move = {
+      from: sourceSquare,
+      to: `${String.fromCharCode(97 + colIndex)}${8 - rowIndex}`,
+    };
+    socket.emit("move", move);
+    draggedPiece = null;
+    sourceSquare = null;
+  }
+
   return (
     <>
       <div className="w-full min-h-full flex items-center justify-center bg-slate-900">
         <div className="w-[32rem] h-[32rem]">
-          {chess.board().map((row, rowIndex) => (
+          {board.map((row, rowIndex) => (
             <div key={rowIndex} className="w-full flex">
               {row.map((col, colIndex) => (
                 <div
@@ -43,11 +65,21 @@ const App = () => {
                       ? "bg-[#fbf5de]"
                       : "bg-[#f2ca5c]"
                   }`}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                  }}
+                  onDrop={() => handleDrop(rowIndex, colIndex)}
                 >
-                  {col &&
-                    pieces.find((p) => {
-                      return p.type === col.type && p.color === col.color;
-                    }).logo}
+                  <div
+                    draggable
+                    className="hover:cursor-grab"
+                    onDragStart={() => handleDragStart(col, rowIndex, colIndex)}
+                  >
+                    {col &&
+                      pieces.find((p) => {
+                        return p.type === col.type && p.color === col.color;
+                      }).logo}
+                  </div>
                 </div>
               ))}
             </div>
