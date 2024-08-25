@@ -52,6 +52,8 @@ io.on("connection", (socket) => {
         io.emit("move", move);
         if (chess.isGameOver()) {
           io.emit("over", chess.turn());
+          delete players.white;
+          delete players.black;
           chess.reset();
         }
         io.emit("boardState", chess.fen());

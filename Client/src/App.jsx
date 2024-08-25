@@ -64,7 +64,9 @@ const App = () => {
           {winner && (
             <div className="absolute top-1/2 left-36">
               <span className="text-5xl">{winner}</span>
-              <div className="text-2xl">(reload to play another game)</div>
+              <button onClick={() => window.location.reload()}>
+                Play Again
+              </button>
             </div>
           )}
           {board.map((row, rowIndex) => (
