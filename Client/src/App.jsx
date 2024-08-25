@@ -5,6 +5,7 @@ import { Chess } from "chess.js";
 const App = () => {
   const [board, setBoard] = useState(new Chess().board());
   const [socket, setSocket] = useState(null);
+  const [winner, setWinner] = useState(null);
   useEffect(() => {
     const newSocket = io("http://localhost:3000");
     setSocket(newSocket);
@@ -13,9 +14,8 @@ const App = () => {
       setBoard(updatedChess.board());
     });
     newSocket.on("over", (turn) => {
-      console.log(
-        `Game Over : ${turn === "w" ? "Black wins.." : "White wins..."}`
-      );
+      setWinner(turn === "w" ? "Black wins.." : "White wins...");
+      newSocket.disconnect();
     });
     return () => {
       newSocket.disconnect();
@@ -61,7 +61,13 @@ const App = () => {
   return (
     <>
       <div className="w-full min-h-full flex items-center justify-center bg-slate-900">
-        <div className="w-[32rem] h-[32rem]">
+        <div className="w-[32rem] h-[32rem] relative">
+          {winner && (
+            <div className="absolute top-1/2 left-36">
+              <span className="text-5xl">{winner}</span>
+              <div className="text-2xl">(reload to play another game)</div>
+            </div>
+          )}
           {board.map((row, rowIndex) => (
             <div key={rowIndex} className="w-full flex">
               {row.map((col, colIndex) => (
