@@ -7,6 +7,7 @@ const { Chess } = require("chess.js");
 
 const app = express();
 const server = createServer(app);
+const chess = new Chess();
 
 let players = {};
 let currentPlayer = "w";
@@ -42,14 +43,14 @@ io.on("connection", (socket) => {
   socket.on("move", (move) => {
     try {
       // During white's turn black cannot move and vice versa
-      if (Chess.turn() === "w" && socket.id !== players.white) return;
-      if (Chess.turn() === "b" && socket.id !== players.black) return;
+      if (chess.turn() === "w" && socket.id !== players.white) return;
+      if (chess.turn() === "b" && socket.id !== players.black) return;
 
-      let result = Chess.move(move);
+      let result = chess.move(move);
       if (result) {
-        currentPlayer = Chess.turn();
+        currentPlayer = chess.turn();
         io.emit("move", move);
-        io.emit("boardState", Chess.fen());
+        io.emit("boardState", chess.fen());
       } else {
         console.log("invalid move...");
         socket.emit("invalid move", move);
