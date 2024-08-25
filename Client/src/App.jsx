@@ -10,7 +10,6 @@ const App = () => {
     setSocket(newSocket);
     newSocket.on("boardState", (fen) => {
       const updatedChess = new Chess(fen);
-      console.log(updatedChess);
       setBoard(updatedChess.board());
     });
     return () => {

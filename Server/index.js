@@ -10,7 +10,6 @@ const server = createServer(app);
 const chess = new Chess();
 
 let players = {};
-let currentPlayer = "w";
 
 const io = new Server(server, {
   cors: {
@@ -48,7 +47,6 @@ io.on("connection", (socket) => {
 
       let result = chess.move(move);
       if (result) {
-        currentPlayer = chess.turn();
         io.emit("move", move);
         io.emit("boardState", chess.fen());
       } else {
