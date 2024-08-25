@@ -29,6 +29,9 @@ io.on("connection", (socket) => {
   } else {
     socket.emit("spectator");
   }
+
+  socket.emit("boardState", chess.fen());
+
   console.log(players);
   socket.on("disconnect", () => {
     if (socket.id === players.white) {
@@ -46,13 +49,11 @@ io.on("connection", (socket) => {
       if (chess.turn() === "b" && socket.id !== players.black) return;
       let result = chess.move(move);
       if (result) {
-        if (chess.isGameOver()) {
-          if (chess.turn() === "w") console.log("black wins...");
-          else console.log("white wins...");
-          io.emit("over", chess.turn());
-          io.disconnectSockets(true);
-        }
         io.emit("move", move);
+        if (chess.isGameOver()) {
+          io.emit("over", chess.turn());
+          chess.reset();
+        }
         io.emit("boardState", chess.fen());
       } else {
         console.log("invalid move...");

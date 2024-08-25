@@ -15,7 +15,6 @@ const App = () => {
     });
     newSocket.on("over", (turn) => {
       setWinner(turn === "w" ? "Black wins.." : "White wins...");
-      newSocket.disconnect();
     });
     return () => {
       newSocket.disconnect();
