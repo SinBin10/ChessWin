@@ -4,6 +4,7 @@ const express = require("express");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const { Chess } = require("chess.js");
+const path = require("path");
 
 const app = express();
 const server = createServer(app);
@@ -16,6 +17,12 @@ const io = new Server(server, {
     origin: "http://localhost:5173", // The Vite dev server address
     methods: ["GET", "POST"],
   },
+});
+
+const __dirname1 = path.resolve();
+app.use(express.static(path.join(__dirname1, "/Client/dist")));
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname1, "Client", "dist", "index.html"));
 });
 
 io.on("connection", (socket) => {
