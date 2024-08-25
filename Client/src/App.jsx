@@ -45,6 +45,9 @@ const App = () => {
       from: sourceSquare,
       to: `${String.fromCharCode(97 + colIndex)}${8 - rowIndex}`,
     };
+    if (draggedPiece.type === "p" && (rowIndex === 0 || rowIndex === 7)) {
+      move.promotion = "q";
+    }
     socket.emit("move", move);
     draggedPiece = null;
     sourceSquare = null;
