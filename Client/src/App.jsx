@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { Chess } from "chess.js";
+require("dotenv").config();
+const PORT = process.env.PORT || 3000;
 
 const App = () => {
   const [board, setBoard] = useState(new Chess().board());
   const [socket, setSocket] = useState(null);
   const [winner, setWinner] = useState(null);
   useEffect(() => {
-    const newSocket = io("https://localhost:3000");
+    const newSocket = io(`https://localhost:${PORT}`);
     setSocket(newSocket);
     newSocket.on("boardState", (fen) => {
       const updatedChess = new Chess(fen);

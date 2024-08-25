@@ -16,7 +16,7 @@ let players = {};
 
 const io = new Server(server, {
   cors: {
-    origin: "https://localhost:3000", // The Vite dev server address
+    origin: `https://localhost:${PORT}`, // The Vite dev server address
     methods: ["GET", "POST"],
   },
 });
