@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { Chess } from "chess.js";
-require("dotenv").config();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.REACT_APP_PORT || 3000;
 
 const App = () => {
   const [board, setBoard] = useState(new Chess().board());
