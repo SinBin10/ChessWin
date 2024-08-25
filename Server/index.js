@@ -44,9 +44,14 @@ io.on("connection", (socket) => {
       // During white's turn black cannot move and vice versa
       if (chess.turn() === "w" && socket.id !== players.white) return;
       if (chess.turn() === "b" && socket.id !== players.black) return;
-
       let result = chess.move(move);
       if (result) {
+        if (chess.isGameOver()) {
+          if (chess.turn() === "w") console.log("black wins...");
+          else console.log("white wins...");
+          io.emit("over", chess.turn());
+          io.disconnectSockets(true);
+        }
         io.emit("move", move);
         io.emit("boardState", chess.fen());
       } else {

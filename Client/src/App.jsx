@@ -12,6 +12,11 @@ const App = () => {
       const updatedChess = new Chess(fen);
       setBoard(updatedChess.board());
     });
+    newSocket.on("over", (turn) => {
+      console.log(
+        `Game Over : ${turn === "w" ? "Black wins.." : "White wins..."}`
+      );
+    });
     return () => {
       newSocket.disconnect();
     };
