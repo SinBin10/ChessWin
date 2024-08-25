@@ -13,7 +13,7 @@ let players = {};
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // The Vite dev server address
+    origin: "https://chess-win.vercel.app/", // The Vite dev server address
     methods: ["GET", "POST"],
   },
 });
