@@ -16,16 +16,16 @@ let players = {};
 
 const io = new Server(server, {
   cors: {
-    origin: `https://localhost:${PORT}`, // The Vite dev server address
+    origin: `http://localhost:5173`, // The Vite dev server address
     methods: ["GET", "POST"],
   },
 });
 
-const __dirname1 = path.resolve();
-app.use(express.static(path.join(__dirname1, "/Client/dist")));
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname1, "Client", "dist", "index.html"));
-});
+// const __dirname1 = path.resolve();
+// app.use(express.static(path.join(__dirname1, "/Client/dist")));
+// app.get("*", (req, res) => {
+//   res.sendFile(path.resolve(__dirname1, "Client", "dist", "index.html"));
+// });
 
 io.on("connection", (socket) => {
   console.log("server connected...");
