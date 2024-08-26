@@ -64,9 +64,11 @@ io.on("connection", (socket) => {
           io.emit("over", chess.turn());
           delete players.white;
           delete players.black;
+          io.emit("boardState", chess.fen());
           chess.reset();
+        } else {
+          io.emit("boardState", chess.fen());
         }
-        io.emit("boardState", chess.fen());
       } else {
         console.log("invalid move...");
         socket.emit("invalid move", move);
