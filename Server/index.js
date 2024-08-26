@@ -35,6 +35,7 @@ io.on("connection", (socket) => {
   } else if (!players.black) {
     players.black = socket.id;
     socket.emit("playerRole", "b");
+    io.emit("bothPlayersConnected");
   } else {
     socket.emit("spectator");
   }
