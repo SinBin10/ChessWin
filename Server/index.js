@@ -4,8 +4,10 @@ const express = require("express");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const { Chess } = require("chess.js");
-const path = require("path");
+const { v4: uuidv4 } = require("uuid");
 
+const path = require("path");
+let roomId = uuidv4();
 const app = express();
 const server = createServer(app);
 const chess = new Chess();
@@ -13,6 +15,7 @@ require("dotenv").config();
 const PORT = process.env.PORT || 3000;
 
 let players = {};
+let games = {};
 
 const io = new Server(server, {
   cors: {
@@ -29,26 +32,42 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log("server connected...");
-  if (!players.white) {
-    players.white = socket.id;
+  if (!games[roomId]?.white) {
+    games[roomId] = { white: socket.id };
+    socket.join(roomId);
+    console.log(`Player ${games[roomId].white} has joined the game.`);
+    // socket
+    //   .to(roomId)
+    //   .emit("message", `Player ${socket.id} has joined the game.`);
+    console.log(`white has joined the room ${roomId}`);
+    console.log(games);
     socket.emit("playerRole", "w");
-  } else if (!players.black) {
-    players.black = socket.id;
+  } else if (!games[roomId]?.black) {
+    games[roomId] = { ...games[roomId], black: socket.id };
     socket.emit("playerRole", "b");
-    io.emit("bothPlayersConnected");
-  } else {
-    socket.emit("spectator");
+    socket.join(roomId);
+    // socket
+    //   .to(roomId)
+    //   .emit("message", `Player ${socket.id} has joined the game.`);
+    console.log(`black has joined the room ${roomId}`);
+    console.log(games);
+    io.to(roomId).emit("bothPlayersConnected");
+    // io.emit("bothPlayersConnected");
+    // players = {};
+    roomId = uuidv4();
   }
 
-  socket.emit("boardState", chess.fen());
+  socket.to(roomId).emit("boardState", chess.fen());
+  // socket.emit("boardState", chess.fen());
 
-  console.log(players);
+  // console.log(players);
   socket.on("disconnect", () => {
-    if (socket.id === players.white) {
-      delete players.white;
+    console.log(roomId);
+    if (socket.id === games[roomId].white) {
+      delete games[roomId].white;
       console.log("player white left...");
-    } else if (socket.id === players.black) {
-      delete players.black;
+    } else if (socket.id === games[roomId].black) {
+      delete games[roomId].black;
       console.log("player black left...");
     }
   });
