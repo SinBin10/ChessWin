@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { Chess } from "chess.js";
-const PORT = /*process.env.REACT_APP_PORT ||*/ 3000;
+const PORT = process.env.REACT_APP_PORT || 3000;
 
 const App = () => {
   const [board, setBoard] = useState(new Chess().board());
@@ -64,23 +64,13 @@ const App = () => {
     sourceSquare = null;
   }
 
-  function handleTouchStart(e, col) {
-    e.preventDefault(); // Prevent the default touch action (like scrolling)
-    handleDragStart(col);
-  }
-
-  function handleTouchEnd(e, rowIndex, colIndex) {
-    e.preventDefault();
-    handleDrop(rowIndex, colIndex);
-  }
-
   return (
     <>
       <div className="w-full min-h-full flex items-center justify-center bg-slate-900">
         {playersConnected === false ? (
           <div className="text-white text-7xl">Connecting....</div>
         ) : (
-          <div className="md:w-[32rem] w-[24rem] md:h-[32rem] h-[24rem] relative">
+          <div className="w-[32rem] h-[32rem] relative">
             {winner && (
               <div className="absolute top-1/2 left-36">
                 <span className="text-5xl">{winner}</span>
@@ -94,25 +84,27 @@ const App = () => {
                 {row.map((col, colIndex) => (
                   <div
                     key={`${rowIndex}-${colIndex}`}
-                    className={`md:h-16 h-12 md:w-16 w-12 md:text-4xl text-3xl flex items-center justify-center ${
+                    className={`h-16 w-16 text-4xl flex items-center justify-center ${
                       (rowIndex + colIndex) % 2 === 0
                         ? "bg-[#fbf5de]"
                         : "bg-[#f2ca5c]"
                     }`}
-                    onDragOver={(e) => e.preventDefault()}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                    }}
                     onDrop={() => handleDrop(rowIndex, colIndex)}
-                    onTouchStart={(e) => handleTouchStart(e, col)}
-                    onTouchEnd={(e) => handleTouchEnd(e, rowIndex, colIndex)}
                   >
                     <div
                       draggable
                       className="hover:cursor-grab"
-                      onDragStart={() => handleDragStart(col)}
+                      onDragStart={() =>
+                        handleDragStart(col, rowIndex, colIndex)
+                      }
                     >
                       {col &&
-                        pieces.find(
-                          (p) => p.type === col.type && p.color === col.color
-                        ).logo}
+                        pieces.find((p) => {
+                          return p.type === col.type && p.color === col.color;
+                        }).logo}
                     </div>
                   </div>
                 ))}
