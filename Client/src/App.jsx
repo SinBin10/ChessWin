@@ -18,7 +18,6 @@ const App = () => {
     });
     newSocket.on("boardState", (fen) => {
       const updatedChess = new Chess(fen);
-      // console.log(updatedChess);
       setBoard(updatedChess.board());
     });
     newSocket.on("over", (turn) => {
@@ -46,7 +45,7 @@ const App = () => {
   let draggedPiece = null;
   let sourceSquare = null;
 
-  function handleDragStart(col, rowIndex, colIndex) {
+  function handleDragStart(col) {
     draggedPiece = col;
     sourceSquare = col.square;
   }
