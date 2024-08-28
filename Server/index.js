@@ -16,7 +16,7 @@ let games = {};
 
 const io = new Server(server, {
   cors: {
-    origin: `http://localhost:5173`, // The Vite dev server address
+    origin: `https://chesswin-1.onrender.com`, // The Vite dev server address
     methods: ["GET", "POST"],
   },
 });
