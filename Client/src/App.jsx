@@ -1,30 +1,42 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { Chess } from "chess.js";
-const PORT = /*process.env.REACT_APP_PORT ||*/ 3000;
 
 const App = () => {
   const [board, setBoard] = useState(new Chess().board());
   const [socket, setSocket] = useState(null);
   const [winner, setWinner] = useState(null);
-  const [playersConnected, setplayersConnected] = useState(false);
+  const [playersConnected, setPlayersConnected] = useState(false);
+  const [role, setRole] = useState(null);
+  const [roomId, setRoomId] = useState(null);
+
   useEffect(() => {
     const newSocket = io("http://localhost:3000");
     setSocket(newSocket);
+
     newSocket.on("bothPlayersConnected", () => {
-      setplayersConnected(true);
+      setPlayersConnected(true);
     });
+
+    newSocket.on("playerRole", ({ role, roomId }) => {
+      setRole(role);
+      setRoomId(roomId);
+    });
+
     newSocket.on("boardState", (fen) => {
       const updatedChess = new Chess(fen);
       setBoard(updatedChess.board());
     });
+
     newSocket.on("over", (turn) => {
       setWinner(turn === "w" ? "Black wins.." : "White wins...");
     });
+
     return () => {
       newSocket.disconnect();
     };
   }, []);
+
   const pieces = [
     { type: "p", color: "w", logo: "♙" },
     { type: "r", color: "w", logo: "♖" },
@@ -40,6 +52,7 @@ const App = () => {
     { type: "q", color: "b", logo: "♛" },
     { type: "k", color: "b", logo: "♚" },
   ];
+
   let draggedPiece = null;
   let sourceSquare = null;
 
@@ -49,69 +62,66 @@ const App = () => {
   }
 
   function handleDrop(rowIndex, colIndex) {
-    if (!draggedPiece) return;
+    if (!draggedPiece || !roomId) return;
+
     const move = {
       from: sourceSquare,
       to: `${String.fromCharCode(97 + colIndex)}${8 - rowIndex}`,
     };
+
     if (draggedPiece.type === "p" && (rowIndex === 0 || rowIndex === 7)) {
       move.promotion = "q";
     }
-    socket.emit("move", move);
+
+    socket.emit("move", { move, roomId });
     draggedPiece = null;
     sourceSquare = null;
   }
 
   return (
-    <>
-      <div className="w-full min-h-full flex items-center justify-center bg-slate-900">
-        {playersConnected === false ? (
-          <div class="text-white text-7xl">Connecting....</div>
-        ) : (
-          <div className="w-[32rem] h-[32rem] relative">
-            {winner && (
-              <div className="absolute top-1/2 left-36">
-                <span className="text-5xl">{winner}</span>
-                <button onClick={() => window.location.reload()}>
-                  Play Again
-                </button>
-              </div>
-            )}
-            {board.map((row, rowIndex) => (
-              <div key={rowIndex} className="w-full flex">
-                {row.map((col, colIndex) => (
+    <div className="w-full min-h-full flex items-center justify-center bg-slate-900">
+      {playersConnected === false ? (
+        <div className="text-white text-7xl">Connecting....</div>
+      ) : (
+        <div className="w-[32rem] h-[32rem] relative">
+          {winner && (
+            <div className="absolute top-1/2 left-36">
+              <span className="text-5xl">{winner}</span>
+              <button onClick={() => window.location.reload()}>
+                Play Again
+              </button>
+            </div>
+          )}
+          {board.map((row, rowIndex) => (
+            <div key={rowIndex} className="w-full flex">
+              {row.map((col, colIndex) => (
+                <div
+                  key={`${rowIndex}-${colIndex}`}
+                  className={`h-16 w-16 text-4xl flex items-center justify-center ${
+                    (rowIndex + colIndex) % 2 === 0
+                      ? "bg-[#fbf5de]"
+                      : "bg-[#f2ca5c]"
+                  }`}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => handleDrop(rowIndex, colIndex)}
+                >
                   <div
-                    key={`${rowIndex}-${colIndex}`}
-                    className={`h-16 w-16 text-4xl flex items-center justify-center ${
-                      (rowIndex + colIndex) % 2 === 0
-                        ? "bg-[#fbf5de]"
-                        : "bg-[#f2ca5c]"
-                    }`}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                    }}
-                    onDrop={() => handleDrop(rowIndex, colIndex)}
+                    draggable
+                    className="hover:cursor-grab"
+                    onDragStart={() => handleDragStart(col, rowIndex, colIndex)}
                   >
-                    <div
-                      draggable
-                      className="hover:cursor-grab"
-                      onDragStart={() =>
-                        handleDragStart(col, rowIndex, colIndex)
-                      }
-                    >
-                      {col &&
-                        pieces.find((p) => {
-                          return p.type === col.type && p.color === col.color;
-                        }).logo}
-                    </div>
+                    {col &&
+                      pieces.find((p) => {
+                        return p.type === col.type && p.color === col.color;
+                      }).logo}
                   </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
