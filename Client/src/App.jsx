@@ -10,7 +10,7 @@ const App = () => {
   const [playersConnected, setplayersConnected] = useState(false);
   const [room, setRoom] = useState("");
   useEffect(() => {
-    const newSocket = io("http://localhost:3000");
+    const newSocket = io("https://chesswin.onrender.com");
     setSocket(newSocket);
     newSocket.on("bothPlayersConnected", (roomid) => {
       setRoom(roomid);
