@@ -4,8 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm install --prefix Server && npm install --prefix Client && npm run build --prefix Client"
+    "install-server": "cd Server && npm install",
+    "start-server": "cd Server && node index.js",
+    "install-client": "cd Client && npm install",
+    "build-client": "cd Client && npm run build",
+    "start-client": "cd Client && npm run start"
   },
   "keywords": [],
   "author": "",
