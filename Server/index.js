@@ -6,9 +6,7 @@ const { Server } = require("socket.io");
 const { Chess } = require("chess.js");
 const { v4: uuidv4 } = require("uuid");
 
-const path = require("path");
 let roomId = uuidv4();
-let tempRoomId = roomId;
 const app = express();
 const server = createServer(app);
 require("dotenv").config();
@@ -23,76 +21,59 @@ const io = new Server(server, {
   },
 });
 
-// const __dirname1 = path.resolve();
-// app.use(express.static(path.join(__dirname1, "/Client/dist")));
-// app.get("*", (req, res) => {
-//   res.sendFile(path.resolve(__dirname1, "Client", "dist", "index.html"));
-// });
 io.on("connection", (socket) => {
-  console.log("server connected...");
-  console.log("temproomId", tempRoomId);
-  socket.data.roomId = tempRoomId;
-
-  if (!games[tempRoomId]?.white) {
-    games[tempRoomId] = { white: socket.id, chess: new Chess() };
-    socket.join(tempRoomId);
-    console.log(`Player ${games[tempRoomId].white} has joined the game.`);
-    socket.emit("playerRole", { role: "w", roomId: tempRoomId });
-    console.log(`white has joined the room ${tempRoomId}`);
-  } else if (!games[tempRoomId]?.black) {
-    games[tempRoomId].black = socket.id;
-    socket.emit("playerRole", { role: "b", roomId: tempRoomId });
-    socket.join(tempRoomId);
-    console.log(`black has joined the room ${tempRoomId}`);
-    io.to(tempRoomId).emit("bothPlayersConnected");
-    tempRoomId = uuidv4();
+  if (!games[roomId]?.white) {
+    games[roomId] = { white: socket.id };
+    socket.data.roomId = roomId;
+    socket.join(roomId);
+  } else if (!games[roomId]?.black) {
+    games[roomId] = { ...games[roomId], black: socket.id, chess: new Chess() };
+    socket.data.roomId = roomId;
+    socket.join(roomId);
+    io.to(roomId).emit("bothPlayersConnected", roomId);
+    io.to(roomId).emit("boardState", games[roomId].chess.fen());
+    roomId = uuidv4();
   }
-
-  roomId = socket.data.roomId;
-  socket.to(roomId).emit("boardState", games[roomId].chess.fen());
-
   socket.on("disconnect", () => {
-    if (socket.id === games[roomId]?.white) {
-      delete games[roomId].white;
+    if (socket.id === games[socket.data.roomId]?.white) {
+      delete games[socket.data.roomId].white;
       console.log("player white left...");
-    } else if (socket.id === games[roomId]?.black) {
-      delete games[roomId].black;
+    } else if (socket.id === games[socket.data.roomId]?.black) {
+      delete games[socket.data.roomId].black;
       console.log("player black left...");
     }
-    console.log(games);
   });
-
-  socket.on("move", ({ move, roomId }) => {
-    console.log("this move is made for the game : ", roomId);
+  socket.on("move", (move) => {
     try {
-      // Ensure only the correct player can make a move
+      // During white's turn black cannot move and vice versa
       if (
-        games[roomId].chess.turn() === "w" &&
-        games[roomId].white !== socket.id
+        games[move.room].chess.turn() === "w" &&
+        games[move.room]?.white !== socket.id
       )
         return;
       if (
-        games[roomId].chess.turn() === "b" &&
-        games[roomId].black !== socket.id
+        games[move.room].chess.turn() === "b" &&
+        games[move.room]?.black !== socket.id
       )
         return;
-
-      let result = games[roomId].chess.move(move);
+      let result = games[move.room].chess.move(move.move);
       if (result) {
-        io.to(roomId).emit("move", move);
-        if (games[roomId].chess.isGameOver()) {
-          io.to(roomId).emit("over", games[roomId].chess.turn());
-          games[roomId].chess.reset();
+        if (games[move.room].chess.isGameOver()) {
+          io.to(move.room).emit("over", games[move.room].chess.turn());
+          delete games[move.room]?.white;
+          delete games[move.room]?.black;
+          io.to(move.room).emit("boardState", games[move.room].chess.fen());
+          games[move.room].chess.reset();
         } else {
-          io.to(roomId).emit("boardState", games[roomId].chess.fen());
+          io.to(move.room).emit("boardState", games[move.room].chess.fen());
         }
       } else {
         console.log("invalid move...");
-        socket.emit("invalidMove", move);
+        socket.to(move.room).emit("invalid move", move);
       }
     } catch (err) {
-      console.log(err);
-      socket.emit("invalidMove", move);
+      console.log("invalid move...");
+      socket.to(move.room).emit("invalid move", move);
     }
   });
 });
