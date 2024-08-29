@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { Chess } from "chess.js";
-const PORT = process.env.REACT_APP_PORT || 3000;
+const PORT = /*process.env.REACT_APP_PORT ||*/ 3000;
 
 const App = () => {
   const [board, setBoard] = useState(new Chess().board());
@@ -10,7 +10,7 @@ const App = () => {
   const [playersConnected, setplayersConnected] = useState(false);
   const [room, setRoom] = useState("");
   useEffect(() => {
-    const newSocket = io("https://chesswin.onrender.com");
+    const newSocket = io("http://localhost:3000"); //Deploy link:- https://chesswin.onrender.com
     setSocket(newSocket);
     newSocket.on("bothPlayersConnected", (roomid) => {
       setRoom(roomid);
