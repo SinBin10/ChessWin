@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { Chess } from "chess.js";
+import { useParams } from "react-router-dom";
 const PORT = /*process.env.REACT_APP_PORT ||*/ 3000;
 
 const Play = () => {
@@ -9,8 +10,11 @@ const Play = () => {
   const [winner, setWinner] = useState(null);
   const [playersConnected, setplayersConnected] = useState(false);
   const [room, setRoom] = useState("");
+  let { roomId } = useParams();
   useEffect(() => {
-    const newSocket = io("http://localhost:3000"); //Deploy link:- https://chesswin.onrender.com
+    const newSocket = io("http://localhost:3000", {
+      query: { roomId },
+    }); //Deploy link:- https://chesswin.onrender.com
     setSocket(newSocket);
     newSocket.on("bothPlayersConnected", (roomid) => {
       setRoom(roomid);

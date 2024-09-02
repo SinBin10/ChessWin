@@ -22,6 +22,9 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
+  if (socket.handshake.query.roomId !== undefined) {
+    roomId = socket.handshake.query.roomId;
+  }
   if (!games[roomId]?.white) {
     games[roomId] = { white: socket.id };
     socket.data.roomId = roomId;
