@@ -70,7 +70,13 @@ const Play = () => {
 
   return (
     <>
-      <div className="w-full min-h-full flex items-center justify-center bg-slate-900">
+      <div className="w-full min-h-full flex flex-col items-center justify-center bg-slate-900">
+        {roomId && (
+          <div className="text-white mb-8">
+            Share this link with your friend to play a game -{" "}
+            <span>{`http://localhost:5173/play/${roomId}`}</span>
+          </div>
+        )}
         {playersConnected === false ? (
           <div className="text-white text-7xl">Connecting....</div>
         ) : (
