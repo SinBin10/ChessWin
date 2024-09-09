@@ -72,9 +72,15 @@ const Play = () => {
     <>
       <div className="w-full min-h-full flex flex-col items-center justify-center bg-slate-900">
         {roomId && (
-          <div className="text-white mb-8">
-            Share this link with your friend to play a game -{" "}
-            <span>{`http://localhost:5173/play/${roomId}`}</span>
+          <div
+            className={`text-white mb-8 ${playersConnected ? "hidden" : ""}`}
+          >
+            Share this link with your friend to play a game -
+            <a
+              className="text-blue-500"
+              target="_blank"
+              href={`http://localhost:5173/play/${roomId}`}
+            >{` http://localhost:5173/play/${roomId}`}</a>
           </div>
         )}
         {playersConnected === false ? (
