@@ -12,7 +12,7 @@ const Play = () => {
   const [room, setRoom] = useState("");
   let { roomId } = useParams();
   useEffect(() => {
-    const newSocket = io("http://localhost:3000", {
+    const newSocket = io("https://chesswin.onrender.com", {
       query: { roomId },
     }); //Deploy link:- https://chesswin.onrender.com
     setSocket(newSocket);

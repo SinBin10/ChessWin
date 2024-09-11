@@ -16,7 +16,7 @@ let games = {};
 
 const io = new Server(server, {
   cors: {
-    origin: `http://localhost:5173`, // deploy link:- https://chesswin-1.onrender.com
+    origin: `https://chesswin-1.onrender.com`, // deploy link:- https://chesswin-1.onrender.com
     methods: ["GET", "POST"],
   },
 });
