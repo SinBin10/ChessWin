@@ -1,5 +1,4 @@
 const express = require("express");
-const path = require("path");
 //explicitly creating the server so that we can have more control over it,
 //the functionality is the same as app.listen(creates a server as well)
 const { createServer } = require("node:http");
@@ -80,12 +79,6 @@ io.on("connection", (socket) => {
       socket.to(move.room).emit("invalid move", move);
     }
   });
-});
-
-app.use(express.static(path.join(__dirname, "../Client/dist")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../Client/dist", "index.html"));
 });
 
 server.listen(PORT, () => {
