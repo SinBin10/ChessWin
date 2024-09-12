@@ -79,8 +79,8 @@ const Play = () => {
             <a
               className="text-blue-500"
               target="_blank"
-              href={`https://chesswin-1.onrender.com/play/${roomId}`}
-            >{` https://chesswin-1.onrender.com/play/${roomId}`}</a>
+              href={`https://chesswin.onrender.com/play/${roomId}`}
+            >{` https://chesswin.onrender.com/play/${roomId}`}</a>
           </div>
         )}
         {playersConnected === false ? (
