@@ -82,19 +82,19 @@ io.on("connection", (socket) => {
   });
 });
 
-// app.use(express.static(path.join(__dirname, "../Client/dist")));
+app.use(express.static(path.join(__dirname, "../Client/dist")));
 
-// app.get("*", (req, res) => {
-//   res.sendFile(path.resolve(__dirname, "../Client/dist", "index.html"));
-// });
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../Client/dist", "index.html"));
+});
 
 // const clientUrl = "http://localhost:5173"; // Deployed Client URL
 // console.log("i am here...");
 
-app.get("*", (req, res) => {
-  // console.log(`redirect url - https://chesswin-1.onrender.com${req.originalUrl}`);
-  res.redirect(`https://chesswin-1.onrender.com${req.originalUrl}`);
-});
+// app.get("*", (req, res) => {
+//   console.log(`redirect url - http://localhost:5173${req.originalUrl}`);
+//   res.redirect(`http://localhost:5173${req.originalUrl}`);
+// });
 
 server.listen(PORT, () => {
   console.log(`server running at http://localhost:${PORT}`);
